@@ -28,14 +28,16 @@ app.get("/", (req, res) => {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const cropsDB = client.db("cropsDB");
     const cropsCollection = cropsDB.collection("crops");
     const usersCollection = cropsDB.collection("users");
+    const interestCollection = cropsDB.collection("interest");
     // crops api Get
     app.get("/crops", async (req, res) => {
       const result = await cropsCollection.find().toArray();
       res.send(result);
+      // .sort({ postedAt: -1 }) .limit(6)
     });
 
     // crops api post
@@ -53,6 +55,53 @@ async function run() {
       res.send(result);
       console.log("need users with id", id);
     });
+    // my post data get
+    app.get("/mypost", async (req, res) => {
+      const email = req.query.email;
+      let query = {};
+
+      if (email) {
+        // query.owner.ownerEmail = email;
+        query = { "owner.ownerEmail": email };
+      }
+      console.log(query);
+
+      const result = await cropsCollection.find(query).toArray();
+      res.send(result);
+    });
+    // interest api post
+
+    app.post("/interest", async (req, res) => {
+      const newInterest = req.body;
+      const result = await interestCollection.insertOne(newInterest);
+      res.send(result);
+      console.log(newInterest);
+    });
+    // interest api get
+    app.get("/interest/:cropId", async (req, res) => {
+      const cropId = req.params.cropId;
+      const result = await interestCollection
+        .find({ cropId: cropId })
+        .toArray();
+      res.send(result);
+      // .sort({ postedAt: -1 }) .limit(6)
+    });
+    // to see my interest page
+    app.get("/myInterest/:email", async (req, res) => {
+      const email = req.params.email;
+      const data = await interestCollection.find({ email }).toArray();
+      res.send(data);
+    });
+
+    // edit crop page
+    app.get("/edit-crop/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await cropsCollection.findOne(query);
+      res.send(result);
+      console.log("need users with id", id);
+    });
+
     // users api post
     app.post("/users", async (req, res) => {
       const newUsers = req.body;
@@ -61,10 +110,56 @@ async function run() {
       console.log(newUsers);
     });
 
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // update crop
+    app.put("/update/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const data = req.body;
+        const objectId = new ObjectId(id);
+
+        const filter = { _id: objectId };
+        const update = { $set: data };
+
+        const result = await cropsCollection.updateOne(filter, update);
+        res.send(result);
+      } catch (error) {
+        console.error("Error updating data:", error);
+        res.status(500).send({ error: "Failed to update crop" });
+      }
+    });
+
+    // delete
+    app.delete("/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await cropsCollection.deleteOne({ _id: new ObjectId(id) });
+      res.send(result);
+    });
+
+    // status update
+
+    app.put("/interest/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const { status } = req.body;
+
+        const filter = { _id: new ObjectId(id) };
+        const updateDoc = {
+          $set: { status: status },
+        };
+
+        const result = await interestCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      } catch (error) {
+        console.error("Error updating interest status:", error);
+        res.status(500).send({ error: "Failed to update interest status" });
+      }
+    });
+
+    //
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
