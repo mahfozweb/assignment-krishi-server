@@ -40,18 +40,18 @@ async function run() {
       // .sort({ postedAt: -1 }) .limit(6)
     });
 
+    // latest crops api
+    app.get("/latest-crops", async (req, res) => {
+      const result = await cropsCollection.find().toArray();
+      res.send(result).sort({ postedAt: -1 }).limit(1);
+    });
+
     // crops api post
     app.post("/crops", async (req, res) => {
       const newCrops = req.body;
       const result = await cropsCollection.insertOne(newCrops);
       res.send(result);
       console.log(newCrops);
-    });
-    // latest crops api
-    app.get("/latest-crops", async (req, res) => {
-      const result = await cropsCollection.find().toArray();
-      res.send(result);
-      // .sort({ postedAt: -1 }) .limit(6)
     });
 
     // crops details page
