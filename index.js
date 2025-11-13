@@ -48,11 +48,10 @@ async function run() {
       console.log(newCrops);
     });
     // latest crops api
-    app.post("/latest-crops", async (req, res) => {
-      const newCrops = req.body;
-      const result = await cropsCollection.insertOne(newCrops);
+    app.get("/latest-crops", async (req, res) => {
+      const result = await cropsCollection.find().toArray();
       res.send(result);
-      console.log(newCrops);
+      // .sort({ postedAt: -1 }) .limit(6)
     });
 
     // crops details page
