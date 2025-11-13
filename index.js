@@ -123,8 +123,8 @@ async function run() {
         const result = await cropsCollection.updateOne(filter, update);
         res.send(result);
       } catch (error) {
-        console.error("Error updating data:", error);
-        res.status(500).send({ error: "Failed to update crop" });
+        console.error("error fixed data:", error);
+        res.status(500).send({ error: "see update error" });
       }
     });
 
@@ -150,8 +150,8 @@ async function run() {
         const result = await interestCollection.updateOne(filter, updateDoc);
         res.send(result);
       } catch (error) {
-        console.error("Error updating interest status:", error);
-        res.status(500).send({ error: "Failed to update interest status" });
+        console.error(" interest status:", error);
+        res.status(500).send({ error: " interest status" });
       }
     });
 
