@@ -47,6 +47,14 @@ async function run() {
       res.send(result);
       console.log(newCrops);
     });
+    // latest crops api
+    app.post("/latest-crops", async (req, res) => {
+      const newCrops = req.body;
+      const result = await cropsCollection.insertOne(newCrops);
+      res.send(result);
+      console.log(newCrops);
+    });
+
     // crops details page
     app.get("/crops/:id", async (req, res) => {
       const id = req.params.id;
