@@ -182,7 +182,7 @@ app.get("/blogs", async (req, res) => {
   res.send(result);
 });
 
-// feature crops
+// feature crops///
 app.get("/feature", async (req, res) => {
   const result = await featureCollection.find().toArray();
 
@@ -190,5 +190,5 @@ app.get("/feature", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`krishi server is running on port ${port}`);
+  console.log(`krishi server is running on the port ${port}`);
 });
